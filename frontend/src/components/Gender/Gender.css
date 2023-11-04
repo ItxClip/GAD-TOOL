@@ -1,0 +1,28 @@
+.outline {
+  /* outline: red solid 1px; */
+}
+
+.Gender {
+  min-height: 75vh;
+  max-width: 100vw;
+  background-color: --bs-gray-100;
+}
+
+.TestChart {
+}
+
+.SideMain {
+}
+
+.SideGraph {
+  min-height: 12.5rem;
+}
+
+.SideGraph canvas {
+  min-height: 10rem;
+}
+
+.dateSelector {
+  min-width: 38rem;
+  outline: #adb5bd solid 1px;
+}
