@@ -120,7 +120,7 @@ const Home = () => {
 
       <TotalAttendance TotalAttendanceState={TotalAttendanceState} />
       <GenderDistribution GenderDistributionState={GenderDistributionState} />
-      <GenderQuarterly GenderQuarterlyState={GenderQuarterlyState} />
+      <GenderQuarterly GenderQuarterlyState={GenderQuarterlyState} /> */}
 
       <div className="eventlist">
         <h1>Logs</h1>
@@ -180,7 +180,7 @@ const Home = () => {
               })}
           </tbody>
         </table>
-      </div> */}
+      </div>
     </div>
   )
 }

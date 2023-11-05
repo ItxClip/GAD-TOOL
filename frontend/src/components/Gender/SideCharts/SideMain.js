@@ -1,10 +1,11 @@
 import React from 'react'
 import '../Gender.css'
-import SideGraph from './SideGraph'
+import GenderQuarterly from './GenderQuarterly'
+import SideTotal from './SideTotal'
 
 const SideMain = () => {
   return (
-    <div className="SideMain col-2 row gap-3 align-items-center align-content-center">
+    <div className="SideMain col-2 row gap-1 align-items-center align-content-center">
       <section className="SideTotal outline card w-100 text-center">
         <div className="card-body">
           <h5 className="card-title m-0">GENDER</h5>
@@ -19,13 +20,19 @@ const SideMain = () => {
         </div>
       </section>
 
-      <section className="SideTotal outline card w-100 text-center">
-        <div className="card-body">
-          <h6 class="card-subtitle mb-2 text-body-secondary">TOTAL</h6>
-          <h5 className="card-title">1234</h5>
+      <section className="card text-center outline w-100 p-0 m-0">
+        <div className="genderT-body card-body m-0 p-0">
+          <h6 class="card-subtitle my-1 text-body-secondary">TOTAL</h6>
+          <SideTotal />
         </div>
       </section>
-      <SideGraph />
+
+      <section className="card text-center outline w-100 p-0 m-0">
+        <div className="genderQ-body card-body m-0 p-0">
+          <h6 class="card-subtitle my-1 text-body-secondary">QUARTERLY</h6>
+          <GenderQuarterly />
+        </div>
+      </section>
     </div>
   )
 }

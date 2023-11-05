@@ -8,18 +8,12 @@
   background-color: --bs-gray-100;
 }
 
-.TestChart {
+.genderT-body {
+  max-height: 12.5rem;
 }
 
-.SideMain {
-}
-
-.SideGraph {
-  min-height: 12.5rem;
-}
-
-.SideGraph canvas {
-  min-height: 10rem;
+.genderQ-body canvas {
+  max-height: 12.5rem;
 }
 
 .dateSelector {
