@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import './Attendance.css'
-import TestChart from './TestChart'
+import AttendanceChart from './AttendanceChart'
 import SideMain from './SideCharts/SideMain'
 
 const Attendance = (aw) => {
@@ -12,7 +12,7 @@ const Attendance = (aw) => {
     // JSX code for component goes here
     <div className="Attendance row mt-5 mb-2 me-0">
       <div className="col-2 outline">navbar</div>
-      <TestChart />
+      <AttendanceChart />
       {/* <div className="col-2 outline">sidechart</div> */}
 
       <SideMain />

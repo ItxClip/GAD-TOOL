@@ -36,7 +36,7 @@ const SideGraph = () => {
 
   return (
     <div className="outline SideGraph p-0 m-0">
-      <Bar className="outline card" data={data} options={options} />
+      <Bar className="outline card shadow-sm" data={data} options={options} />
     </div>
   )
 }
