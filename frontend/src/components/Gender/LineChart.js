@@ -12,7 +12,36 @@ import { Line } from 'react-chartjs-2'
 import { months } from './DateSelector'
 import DateSelector from './DateSelector'
 
-const LineChart = () => {
+function calculateGenderCountsPerMonth(genderByMonth, gender) {
+    if (
+        gender !== 'male' &&
+        gender !== 'female' &&
+        gender !== 'preferNotToSay'
+    ) {
+        throw new Error(
+            'Invalid gender parameter. It must be "male", "female", or "preferNotToSay".'
+        )
+    }
+
+    const genderCountsPerMonth = []
+
+    for (const month in genderByMonth) {
+        if (genderByMonth.hasOwnProperty(month)) {
+            genderCountsPerMonth.push(genderByMonth[month][gender])
+        }
+    }
+    return genderCountsPerMonth
+}
+
+const LineChart = ({
+    excelFiles,
+    GenderDistributionState,
+    updateData,
+    updateDataQuarterly,
+    updateLabel,
+    updateXAxisLabel,
+    updateSideInfo,
+}) => {
     ChartJS.register(
         LineElement,
         CategoryScale,
@@ -22,13 +51,17 @@ const LineChart = () => {
         PointElement
     )
 
+    console.log('LineChart/Main chart: ', GenderDistributionState)
     const data = {
         type: 'line',
-        labels: months,
+        labels: GenderDistributionState.label,
         datasets: [
             {
                 label: 'Male',
-                data: [49, 12, 34, 56, 78, 90, 12, 34, 56, 78, 90, 12],
+                data: calculateGenderCountsPerMonth(
+                    GenderDistributionState.data,
+                    'male'
+                ),
                 fill: false,
                 tension: 0.4,
                 backgroundColor: 'rgba(54, 162, 235, 0.6)',
@@ -40,7 +73,10 @@ const LineChart = () => {
 
             {
                 label: 'Female',
-                data: [40, 31, 22, 13, 4, 5, 16, 27, 38, 49, 50, 61],
+                data: calculateGenderCountsPerMonth(
+                    GenderDistributionState.data,
+                    'female'
+                ),
                 fill: false,
                 tension: 0.4,
                 backgroundColor: 'rgba(255, 99, 132, 0.6)',
@@ -52,7 +88,10 @@ const LineChart = () => {
 
             {
                 label: 'Prefer Not to Say',
-                data: [81, 72, 63, 54, 45, 36, 27, 18, 9, 0, 11, 22],
+                data: calculateGenderCountsPerMonth(
+                    GenderDistributionState.data,
+                    'preferNotToSay'
+                ),
                 fill: false,
                 tension: 0.4,
                 backgroundColor: 'rgba(255, 206, 86, 0.6)',
@@ -84,7 +123,7 @@ const LineChart = () => {
                 display: true,
                 title: {
                     display: true,
-                    text: 'Months',
+                    text: GenderDistributionState.xAxisLabel,
                 },
             },
             y: {
@@ -106,7 +145,15 @@ const LineChart = () => {
 
     return (
         <div className="TestChart outline col-8 d-flex flex-column align-items-center justify-content-center">
-            <DateSelector />
+            <DateSelector
+                excelFiles={excelFiles}
+                GenderDistributionState={GenderDistributionState}
+                updateChartData={updateData}
+                updateChartDataQuarterly={updateDataQuarterly}
+                updateChartLabel={updateLabel}
+                updateXAxisLabel={updateXAxisLabel}
+                updateSideInfo={updateSideInfo}
+            />
             <Line className="card shadow" data={data} options={options} />
         </div>
     )

@@ -23,7 +23,7 @@ export const months = [
  * @param {Array} data - An array of student objects containing their gender and timestamp.
  * @returns {Object} An object containing the number of male, female and prefer not to say students by quarter.
  */
-function calculateGenderByQuarter(selectedYear, data) {
+export function calculateGenderByQuarter(selectedYear, data) {
     let genderByQuarter = {
         Q1: { male: 0, female: 0, preferNotToSay: 0 },
         Q2: { male: 0, female: 0, preferNotToSay: 0 },
@@ -52,36 +52,68 @@ function calculateGenderByQuarter(selectedYear, data) {
     return genderByQuarter
 }
 
-export function filterByYear(selectedYear, data) {
-    let counts = Array(12).fill(0)
-    let gender = { male: 0, female: 0, preferNotToSay: 0 }
-
-    let genderByQuarter = calculateGenderByQuarter(selectedYear, data)
+export function calculateGenderByMonth(selectedYear, data) {
+    let genderByMonth = {
+        1: { male: 0, female: 0, preferNotToSay: 0 },
+        2: { male: 0, female: 0, preferNotToSay: 0 },
+        3: { male: 0, female: 0, preferNotToSay: 0 },
+        4: { male: 0, female: 0, preferNotToSay: 0 },
+        5: { male: 0, female: 0, preferNotToSay: 0 },
+        6: { male: 0, female: 0, preferNotToSay: 0 },
+        7: { male: 0, female: 0, preferNotToSay: 0 },
+        8: { male: 0, female: 0, preferNotToSay: 0 },
+        9: { male: 0, female: 0, preferNotToSay: 0 },
+        10: { male: 0, female: 0, preferNotToSay: 0 },
+        11: { male: 0, female: 0, preferNotToSay: 0 },
+        12: { male: 0, female: 0, preferNotToSay: 0 },
+    }
 
     data.forEach((student) => {
         let date = new Date(student.timestamp)
         if (date.getFullYear() === selectedYear) {
-            counts[date.getMonth()]++
-
+            let month = date.getMonth() + 1
             switch (student.sex) {
                 case 'Male':
-                    gender.male++
+                    genderByMonth[`${month}`].male++
                     break
                 case 'Female':
-                    gender.female++
+                    genderByMonth[`${month}`].female++
                     break
                 default:
-                    gender.preferNotToSay++
+                    genderByMonth[`${month}`].preferNotToSay++
                     break
             }
         }
     })
 
-    return { counts, gender, genderByQuarter }
+    return genderByMonth
+}
+
+export function filterByYear(selectedYear, data) {
+    let totalGender = { male: 0, female: 0, preferNotToSay: 0 }
+    let genderByQuarter = calculateGenderByQuarter(selectedYear, data)
+
+    data.forEach((student) => {
+        let date = new Date(student.timestamp)
+        if (date.getFullYear() === selectedYear) {
+            switch (student.sex) {
+                case 'Male':
+                    totalGender.male++
+                    break
+                case 'Female':
+                    totalGender.female++
+                    break
+                default:
+                    totalGender.preferNotToSay++
+                    break
+            }
+        }
+    })
+
+    return { totalGender, genderByQuarter }
 }
 
 export function filterByMonth(selectedYear, selectedMonth, data) {
-    let counts = []
     let eventNames = []
     let gender = { male: 0, female: 0, preferNotToSay: 0 }
 
@@ -91,12 +123,8 @@ export function filterByMonth(selectedYear, selectedMonth, data) {
             date.getFullYear() === selectedYear &&
             date.getMonth() === selectedMonth
         ) {
-            let index = eventNames.indexOf(student.eventName)
-            if (index !== -1) {
-                counts[index]++
-            } else {
+            if (!eventNames.includes(student.eventName)) {
                 eventNames.push(student.eventName)
-                counts.push(1)
             }
 
             // Get gender distribution data
@@ -114,7 +142,7 @@ export function filterByMonth(selectedYear, selectedMonth, data) {
         }
     })
 
-    return { counts, eventNames, gender }
+    return { eventNames, gender }
 }
 
 const DateSelector = ({
@@ -122,8 +150,8 @@ const DateSelector = ({
     updateChartLabel,
     excelFiles,
     updateXAxisLabel,
-    GenderDistribution_updateData,
-    GenderQuarterly_updateData,
+    updateChartDataQuarterly,
+    updateSideInfo,
 }) => {
     const [year, setYear] = useState(new Date().getFullYear())
     const [month, setMonth] = useState(new Date().getMonth() + 1)
@@ -138,41 +166,49 @@ const DateSelector = ({
             } else {
                 if (isOnlyMonths) {
                     const result = filterByMonth(year, month - 1, excelFiles)
-                    const counts = result.counts
                     const eventNames = result.eventNames
                     const gender = Object.values(result.gender)
 
+                    // Main chart
                     updateChartLabel(eventNames)
-                    updateChartData(counts)
                     updateXAxisLabel('Events')
+                    updateChartData(gender)
+                    console.log('results: ', result)
+                    console.log('gender: ', gender)
 
-                    // Gender Distribution
-                    console.log('gender: ')
-                    console.log(gender)
-                    GenderDistribution_updateData(gender)
+                    // Total Gender Distribution
+                    const sideData = filterByYear(year, excelFiles)
+                    const totalGender = Object.values(sideData.totalGender)
+                    updateSideInfo(totalGender, year, months[month - 1])
+
+                    // Gender Quarterly
+                    const genderQuarterly = Object.values(
+                        sideData.genderByQuarter
+                    )
+                    updateChartDataQuarterly(genderQuarterly)
+                    console.log('Month_GenderTotal: ', totalGender)
+                    console.log('Month_GenderByQuarter: ', genderQuarterly)
                 } else {
                     // Total Gender by Year
                     const result = filterByYear(year, excelFiles)
-                    const counts = result.counts
                     const eventNames = months
 
-                    updateChartData(counts)
                     updateChartLabel(eventNames)
                     updateXAxisLabel('Months')
 
-                    //
-                    // Gender Distribution
-                    const gender = Object.values(result.gender)
-                    GenderDistribution_updateData(gender)
+                    // Main Gender Chart
+                    const gender = calculateGenderByMonth(year, excelFiles)
+                    updateChartData(gender)
 
-                    //
+                    // Total Gender Distribution
+                    const totalGender = Object.values(result.totalGender)
+                    updateSideInfo(totalGender, year, null)
+
                     // Gender Quarterly
                     const genderQuarterly = Object.values(
                         result.genderByQuarter
                     )
-                    GenderQuarterly_updateData(genderQuarterly)
-                    console.log('genderQuarterly: ')
-                    console.log(genderQuarterly)
+                    updateChartDataQuarterly(genderQuarterly)
                 }
             }
         } catch (error) {

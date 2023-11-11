@@ -3,7 +3,10 @@ import '../Gender.css'
 import GenderQuarterly from './GenderQuarterly'
 import SideTotal from './SideTotal'
 
-const SideMain = () => {
+const SideMain = ({ GenderDistributionState }) => {
+    let year = GenderDistributionState.selectedYear || '-'
+    let month = GenderDistributionState.selectedMonth || '-'
+
     return (
         <div className="SideMain col-2 row gap-1 align-items-center align-content-center">
             <section className="SideTotal outline card shadow-sm w-100 text-center">
@@ -17,8 +20,8 @@ const SideMain = () => {
                     <h6 className="card-subtitle mb-2 text-body-secondary">
                         DATE
                     </h6>
-                    <h5 className="card-title">2023</h5>
-                    <p className="card-text">-</p>
+                    <h5 className="card-title">{year}</h5>
+                    <p className="card-text">{month}</p>
                 </div>
             </section>
 
@@ -27,7 +30,9 @@ const SideMain = () => {
                     <h6 className="card-subtitle my-1 text-body-secondary">
                         TOTAL
                     </h6>
-                    <SideTotal />
+                    <SideTotal
+                        GenderDistributionState={GenderDistributionState}
+                    />
                 </div>
             </section>
 
@@ -36,7 +41,9 @@ const SideMain = () => {
                     <h6 className="card-subtitle my-1 text-body-secondary">
                         QUARTERLY
                     </h6>
-                    <GenderQuarterly />
+                    <GenderQuarterly
+                        GenderDistributionState={GenderDistributionState}
+                    />
                 </div>
             </section>
         </div>

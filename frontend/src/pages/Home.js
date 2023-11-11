@@ -9,36 +9,6 @@ import EventsComp from '../components/EventsComp/EventsComp'
 const Home = () => {
     const [excelFiles, setExcelFiles] = useState(null)
 
-    const [GenderDistributionState, setGenderDistributionState] = useState({
-        data: {},
-    })
-
-    const [GenderQuarterlyState, setGenderQuarterlyState] = useState({
-        data: {},
-    })
-
-    /**
-     * Updates the chart data for GenderDistribution chart
-     * @param {Object} newData - The new data to update the chart with
-     */
-    const GenderDistribution_updateData = (newData) => {
-        setGenderDistributionState((prevState) => ({
-            ...prevState,
-            data: newData,
-        }))
-    }
-
-    /**
-     * Updates the chart data for GenderQuarterly chart
-     * @param {Object} newData - The new data to update the chart with
-     */
-    const GenderQuarterly_updateData = (newData) => {
-        setGenderQuarterlyState((prevState) => ({
-            ...prevState,
-            data: newData,
-        }))
-    }
-
     useEffect(() => {
         const fetchFiles = async () => {
             const response = await fetch('/api/file')

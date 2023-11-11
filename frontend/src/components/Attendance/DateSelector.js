@@ -52,6 +52,7 @@ export function filterByYear(selectedYear, data) {
 export function filterByMonth(selectedYear, selectedMonth, data) {
     let counts = []
     let eventNames = []
+    let total = 0
 
     data.forEach((student) => {
         let date = new Date(student.timestamp)
@@ -66,10 +67,11 @@ export function filterByMonth(selectedYear, selectedMonth, data) {
                 eventNames.push(student.eventName)
                 counts.push(1)
             }
+            total++
         }
     })
 
-    return { counts, eventNames }
+    return { counts, eventNames, total }
 }
 
 const DateSelector = ({
@@ -99,6 +101,14 @@ const DateSelector = ({
                     updateChartLabel(eventNames)
                     updateChartData(counts)
                     updateXAxisLabel('Events')
+
+                    // Total Attendance by Quarter
+                    updateDataByQuarter(
+                        calculateAttendanceByQuarter(year, excelFiles)
+                    )
+
+                    // Side Info
+                    updateSideInfo(result.total, year, months[month - 1])
                 } else {
                     // Total Attendance by Year
                     const result = filterByYear(year, excelFiles)
@@ -110,12 +120,10 @@ const DateSelector = ({
                     updateXAxisLabel('Months')
 
                     // Total Attendance by Quarter
-                    const attendanceByQuarter = result.attendanceByQuarter
-                    updateDataByQuarter(attendanceByQuarter)
+                    updateDataByQuarter(result.attendanceByQuarter)
 
                     // Side Info
-                    const totalYear = result.total
-                    updateSideInfo(totalYear, year, null)
+                    updateSideInfo(result.total, year, null)
                 }
             }
         } catch (error) {
