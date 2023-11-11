@@ -13,7 +13,9 @@ const SideMain = () => {
 
             <section className="SideDate outline card shadow-sm w-100 text-center">
                 <div className="card-body">
-                    <h6 class="card-subtitle mb-2 text-body-secondary">DATE</h6>
+                    <h6 className="card-subtitle mb-2 text-body-secondary">
+                        DATE
+                    </h6>
                     <h5 className="card-title">2023</h5>
                     <p className="card-text">-</p>
                 </div>
@@ -21,7 +23,7 @@ const SideMain = () => {
 
             <section className="SideTotal outline card shadow-sm w-100 text-center">
                 <div className="card-body">
-                    <h6 class="card-subtitle mb-2 text-body-secondary">
+                    <h6 className="card-subtitle mb-2 text-body-secondary">
                         TOTAL
                     </h6>
                     <h5 className="card-title">1234</h5>

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { months, filterByYear } from '../components/Attendance/DateSelector'
 import Attendance from '../components/Attendance/Attendance'
 import Gender from '../components/Gender/Gender'
 import EventsComp from '../components/EventsComp/EventsComp'
@@ -10,13 +9,6 @@ import EventsComp from '../components/EventsComp/EventsComp'
 const Home = () => {
     const [excelFiles, setExcelFiles] = useState(null)
 
-    // The state and setState for TotalAttendance chart
-    const [TotalAttendanceState, setTotalAttendanceState] = useState({
-        data: {},
-        label: months,
-        xAxisLabel: 'Months',
-    })
-
     const [GenderDistributionState, setGenderDistributionState] = useState({
         data: {},
     })
@@ -24,39 +16,6 @@ const Home = () => {
     const [GenderQuarterlyState, setGenderQuarterlyState] = useState({
         data: {},
     })
-
-    /**
-     * Updates the chart data for TotalAttendance chart
-     * @param {Object} newData - The new data to update the chart with
-     */
-    const TotalAttendance_updateData = (newData) => {
-        setTotalAttendanceState((prevState) => ({
-            ...prevState,
-            data: newData,
-        }))
-    }
-
-    /**
-     * Updates the chart label for TotalAttendance chart
-     * @param {string[]} newLabel - The new label to update the chart with
-     */
-    const TotalAttendance_updateLabel = (newLabel) => {
-        setTotalAttendanceState((prevState) => ({
-            ...prevState,
-            label: newLabel,
-        }))
-    }
-
-    /**
-     * Updates the X-axis label for TotalAttendance chart
-     * @param {string} newLabel - The new X-axis label to update the chart with
-     */
-    const TotalAttendance_updateXAxisLabel = (newLabel) => {
-        setTotalAttendanceState((prevState) => ({
-            ...prevState,
-            xAxisLabel: newLabel,
-        }))
-    }
 
     /**
      * Updates the chart data for GenderDistribution chart
@@ -89,14 +48,14 @@ const Home = () => {
                 setExcelFiles(json)
                 console.log(json)
                 // Calls the update function to set the initial chart data
-                const initialData = filterByYear(new Date().getFullYear(), json)
-                const TotalAttendance = initialData.counts
-                const GenderDist = Object.values(initialData.gender)
-                //const GenderQuarterly = initialData.quarterly;
+                // const initialData = filterByYear(new Date().getFullYear(), json)
+                // const TotalAttendance = initialData.counts
+                // const GenderDist = Object.values(initialData.gender)
+                // //const GenderQuarterly = initialData.quarterly;
 
-                TotalAttendance_updateData(TotalAttendance)
-                GenderDistribution_updateData(GenderDist)
-                GenderQuarterly_updateData(initialData.genderByQuarter)
+                // TotalAttendance_updateData(TotalAttendance)
+                // GenderDistribution_updateData(GenderDist)
+                // GenderQuarterly_updateData(initialData.genderByQuarter)
             }
         }
         fetchFiles()
@@ -104,9 +63,9 @@ const Home = () => {
 
     return (
         <div className="home outline d-flex flex-column align-items-center align-content-center justify-content-center">
-            <Attendance />
-            <Gender />
-            <EventsComp />
+            <Attendance excelFiles={excelFiles} />
+            <Gender excelFiles={excelFiles} />
+            <EventsComp excelFiles={excelFiles} />
 
             <div className="eventlist">
                 <h1>Logs</h1>

@@ -8,22 +8,21 @@ import {
     Legend,
 } from 'chart.js'
 import { Bar } from 'react-chartjs-2'
-import { months } from './DateSelector'
 import DateSelector from './DateSelector'
 
-const AttendanceChart = () => {
+const AttendanceChart = ({
+    excelFiles,
+    TotalAttendanceState,
+    updateData,
+    updateDataByQuarter,
+    updateLabel,
+    updateXAxisLabel,
+    updateSideInfo,
+}) => {
     ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend)
 
-    const randomColors = Array.from(
-        { length: 12 },
-        () =>
-            `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(
-                Math.random() * 256
-            )}, ${Math.floor(Math.random() * 256)}, 0.6)`
-    )
-
     const data = {
-        labels: months,
+        labels: TotalAttendanceState.label,
         datasets: [
             {
                 label: 'Attendance',
@@ -31,7 +30,7 @@ const AttendanceChart = () => {
                 borderWidth: 2,
                 borderColor: 'rgba(54, 162, 235, 1)',
                 borderRadius: 15,
-                data: [65, 59, 80, 81, 56, 55, 40, 19, 86, 27, 90, 100],
+                data: TotalAttendanceState.data,
             },
         ],
     }
@@ -51,7 +50,7 @@ const AttendanceChart = () => {
                 display: true,
                 title: {
                     display: true,
-                    text: 'Months',
+                    text: TotalAttendanceState.xAxisLabel,
                 },
             },
             y: {
@@ -66,7 +65,14 @@ const AttendanceChart = () => {
 
     return (
         <div className="AttendanceChart outline col-8 d-flex flex-column align-items-center justify-content-center">
-            <DateSelector />
+            <DateSelector
+                excelFiles={excelFiles}
+                updateChartData={updateData}
+                updateDataByQuarter={updateDataByQuarter}
+                updateChartLabel={updateLabel}
+                updateXAxisLabel={updateXAxisLabel}
+                updateSideInfo={updateSideInfo}
+            />
             <Bar className="card shadow" data={data} options={options} />
         </div>
     )

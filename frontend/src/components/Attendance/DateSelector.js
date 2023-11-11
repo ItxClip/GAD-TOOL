@@ -17,73 +17,41 @@ export const months = [
     'December',
 ]
 
-/**
- * Calculates the number of male, female and prefer not to say students by quarter for a given year.
- * @param {number} selectedYear - The year for which to calculate the gender distribution.
- * @param {Array} data - An array of student objects containing their gender and timestamp.
- * @returns {Object} An object containing the number of male, female and prefer not to say students by quarter.
- */
-function calculateGenderByQuarter(selectedYear, data) {
-    let genderByQuarter = {
-        Q1: { male: 0, female: 0, preferNotToSay: 0 },
-        Q2: { male: 0, female: 0, preferNotToSay: 0 },
-        Q3: { male: 0, female: 0, preferNotToSay: 0 },
-        Q4: { male: 0, female: 0, preferNotToSay: 0 },
-    }
+function calculateAttendanceByQuarter(selectedYear, data) {
+    const attendanceByQuarter = [0, 0, 0, 0]
 
-    data.forEach((student) => {
-        let date = new Date(student.timestamp)
+    data.forEach((item) => {
+        const date = new Date(item.timestamp)
+
         if (date.getFullYear() === selectedYear) {
             let quarter = Math.floor(date.getMonth() / 3) + 1
-            switch (student.sex) {
-                case 'Male':
-                    genderByQuarter[`Q${quarter}`].male++
-                    break
-                case 'Female':
-                    genderByQuarter[`Q${quarter}`].female++
-                    break
-                default:
-                    genderByQuarter[`Q${quarter}`].preferNotToSay++
-                    break
-            }
+            attendanceByQuarter[quarter - 1]++
         }
     })
 
-    return genderByQuarter
+    return attendanceByQuarter
 }
 
 export function filterByYear(selectedYear, data) {
     let counts = Array(12).fill(0)
-    let gender = { male: 0, female: 0, preferNotToSay: 0 }
+    let total = 0
 
-    let genderByQuarter = calculateGenderByQuarter(selectedYear, data)
+    let attendanceByQuarter = calculateAttendanceByQuarter(selectedYear, data)
 
     data.forEach((student) => {
         let date = new Date(student.timestamp)
         if (date.getFullYear() === selectedYear) {
             counts[date.getMonth()]++
-
-            switch (student.sex) {
-                case 'Male':
-                    gender.male++
-                    break
-                case 'Female':
-                    gender.female++
-                    break
-                default:
-                    gender.preferNotToSay++
-                    break
-            }
+            total++
         }
     })
 
-    return { counts, gender, genderByQuarter }
+    return { counts, total, attendanceByQuarter }
 }
 
 export function filterByMonth(selectedYear, selectedMonth, data) {
     let counts = []
     let eventNames = []
-    let gender = { male: 0, female: 0, preferNotToSay: 0 }
 
     data.forEach((student) => {
         let date = new Date(student.timestamp)
@@ -98,32 +66,19 @@ export function filterByMonth(selectedYear, selectedMonth, data) {
                 eventNames.push(student.eventName)
                 counts.push(1)
             }
-
-            // Get gender distribution data
-            switch (student.sex) {
-                case 'Male':
-                    gender.male++
-                    break
-                case 'Female':
-                    gender.female++
-                    break
-                default:
-                    gender.preferNotToSay++
-                    break
-            }
         }
     })
 
-    return { counts, eventNames, gender }
+    return { counts, eventNames }
 }
 
 const DateSelector = ({
-    updateChartData,
-    updateChartLabel,
     excelFiles,
+    updateChartData,
+    updateDataByQuarter,
+    updateChartLabel,
     updateXAxisLabel,
-    GenderDistribution_updateData,
-    GenderQuarterly_updateData,
+    updateSideInfo,
 }) => {
     const [year, setYear] = useState(new Date().getFullYear())
     const [month, setMonth] = useState(new Date().getMonth() + 1)
@@ -140,16 +95,10 @@ const DateSelector = ({
                     const result = filterByMonth(year, month - 1, excelFiles)
                     const counts = result.counts
                     const eventNames = result.eventNames
-                    const gender = Object.values(result.gender)
 
                     updateChartLabel(eventNames)
                     updateChartData(counts)
                     updateXAxisLabel('Events')
-
-                    // Gender Distribution
-                    console.log('gender: ')
-                    console.log(gender)
-                    GenderDistribution_updateData(gender)
                 } else {
                     // Total Attendance by Year
                     const result = filterByYear(year, excelFiles)
@@ -160,19 +109,13 @@ const DateSelector = ({
                     updateChartLabel(eventNames)
                     updateXAxisLabel('Months')
 
-                    //
-                    // Gender Distribution
-                    const gender = Object.values(result.gender)
-                    GenderDistribution_updateData(gender)
+                    // Total Attendance by Quarter
+                    const attendanceByQuarter = result.attendanceByQuarter
+                    updateDataByQuarter(attendanceByQuarter)
 
-                    //
-                    // Gender Quarterly
-                    const genderQuarterly = Object.values(
-                        result.genderByQuarter
-                    )
-                    GenderQuarterly_updateData(genderQuarterly)
-                    console.log('genderQuarterly: ')
-                    console.log(genderQuarterly)
+                    // Side Info
+                    const totalYear = result.total
+                    updateSideInfo(totalYear, year, null)
                 }
             }
         } catch (error) {
@@ -217,12 +160,15 @@ const DateSelector = ({
                     <input
                         className="me-2"
                         type="checkbox"
-                        id="isOnlyMonths"
-                        name="isOnlyMonths"
+                        id="isOnlyMonths_attendance"
+                        name="isOnlyMonths_attendance"
                         onChange={(e) => setIsOnlyMonths(e.target.checked)}
                     />
 
-                    <label className="text-nowrap" htmlFor="isOnlyMonths">
+                    <label
+                        className="text-nowrap"
+                        htmlFor="isOnlyMonths_attendance"
+                    >
                         Attendance/Month
                     </label>
                 </div>

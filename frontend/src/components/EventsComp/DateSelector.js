@@ -217,12 +217,15 @@ const DateSelector = ({
                     <input
                         className="me-2"
                         type="checkbox"
-                        id="isOnlyMonths"
-                        name="isOnlyMonths"
+                        id="isOnlyMonths_events"
+                        name="isOnlyMonths_events"
                         onChange={(e) => setIsOnlyMonths(e.target.checked)}
                     />
 
-                    <label className="text-nowrap" htmlFor="isOnlyMonths">
+                    <label
+                        className="text-nowrap"
+                        htmlFor="isOnlyMonths_events"
+                    >
                         Events/Month
                     </label>
                 </div>
