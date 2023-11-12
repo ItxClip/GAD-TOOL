@@ -133,7 +133,7 @@ const DateSelector = ({
 
     return (
         <>
-            <div className="dateSelector d-flex flex-row align-items-center justify-content-evenly m-2 p-2 rounded-3">
+            <div className="dateSelector_attendance d-flex flex-row align-items-center justify-content-evenly m-2 p-2 rounded-3">
                 <div className="d-flex justify-content-center align-items-center">
                     <label>Year:</label>
                     <select

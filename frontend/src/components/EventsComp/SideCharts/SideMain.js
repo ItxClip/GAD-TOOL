@@ -2,7 +2,11 @@ import React from 'react'
 import '../EventsComp.css'
 import SideGraph from './SideGraph'
 
-const SideMain = () => {
+const SideMain = ({ TotalEventState }) => {
+    let year = TotalEventState.selectedYear || '-'
+    let month = TotalEventState.selectedMonth || '-'
+    let total = TotalEventState.totalYear || '-'
+
     return (
         <div className="SideMain col-2 row gap-1 align-items-center align-content-center">
             <section className="SideTotal outline card shadow-sm w-100 text-center">
@@ -16,8 +20,8 @@ const SideMain = () => {
                     <h6 className="card-subtitle mb-2 text-body-secondary">
                         DATE
                     </h6>
-                    <h5 className="card-title">2023</h5>
-                    <p className="card-text">-</p>
+                    <h5 className="card-title">{year}</h5>
+                    <p className="card-text">{month}</p>
                 </div>
             </section>
 
@@ -26,10 +30,10 @@ const SideMain = () => {
                     <h6 className="card-subtitle mb-2 text-body-secondary">
                         TOTAL
                     </h6>
-                    <h5 className="card-title">1234</h5>
+                    <h5 className="card-title">{total}</h5>
                 </div>
             </section>
-            <SideGraph />
+            <SideGraph TotalEventState={TotalEventState} />
         </div>
     )
 }

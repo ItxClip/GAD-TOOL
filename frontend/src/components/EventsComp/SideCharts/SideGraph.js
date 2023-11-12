@@ -9,7 +9,7 @@ import {
 } from 'chart.js'
 import { Bar } from 'react-chartjs-2'
 
-const SideGraph = () => {
+const SideGraph = ({ TotalEventState }) => {
     ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend)
 
     const data = {
@@ -17,9 +17,13 @@ const SideGraph = () => {
         datasets: [
             {
                 label: 'Events',
-                backgroundColor: 'rgba(255, 206, 86, 1)',
+                borderWidth: 0,
+                borderColor: 'rgba(255, 206, 86, 1)',
+                backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                hoverBackgroundColor: 'rgba(255, 206, 86, 1)',
+                hoverBorderWidth: 3,
                 borderRadius: 5,
-                data: [131, 87, 214, 158],
+                data: TotalEventState.dataQuarter,
             },
         ],
     }

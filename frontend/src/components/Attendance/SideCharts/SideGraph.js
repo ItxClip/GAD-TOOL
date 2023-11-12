@@ -17,7 +17,11 @@ const SideGraph = ({ TotalAttendanceState }) => {
         datasets: [
             {
                 label: 'Attendance',
-                backgroundColor: 'rgba(75,192,192,1)',
+                borderWidth: 0,
+                backgroundColor: 'rgba(75,192,192,0.6)',
+                borderColor: 'rgba(75,192,192,1)',
+                hoverBackgroundColor: 'rgba(75,192,192,1)',
+                hoverBorderWidth: 3,
                 borderRadius: 5,
                 data: TotalAttendanceState.dataQuarter,
             },

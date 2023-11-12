@@ -11,19 +11,29 @@ import { Bar } from 'react-chartjs-2'
 import { months } from './DateSelector'
 import DateSelector from './DateSelector'
 
-const EventsChart = () => {
+const EventsChart = ({
+    excelFiles,
+    TotalEventState,
+    updateData,
+    updateDataByQuarter,
+    updateLabel,
+    updateXAxisLabel,
+    updateSideInfo,
+}) => {
     ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend)
 
     const data = {
-        labels: months,
+        labels: TotalEventState.label,
         datasets: [
             {
                 label: 'Events',
-                backgroundColor: 'rgba(248, 198, 70, 0.7)',
-                borderWidth: 2,
+                backgroundColor: 'rgba(248, 198, 70, 0.6)',
+                borderWidth: 0,
                 borderColor: 'rgba(255, 206, 86, 1)',
+                hoverBackgroundColor: 'rgba(255, 206, 86, 1)',
+                hoverBorderWidth: 3,
                 borderRadius: 15,
-                data: [65, 59, 80, 81, 56, 55, 40, 19, 86, 27, 90, 100],
+                data: TotalEventState.data,
             },
         ],
     }
@@ -43,7 +53,7 @@ const EventsChart = () => {
                 display: true,
                 title: {
                     display: true,
-                    text: 'Months',
+                    text: TotalEventState.xAxisLabel,
                 },
             },
             y: {
@@ -58,7 +68,14 @@ const EventsChart = () => {
 
     return (
         <div className="EventsChart outline col-8 d-flex flex-column align-items-center justify-content-center">
-            <DateSelector />
+            <DateSelector
+                excelFiles={excelFiles}
+                updateChartData={updateData}
+                updateDataByQuarter={updateDataByQuarter}
+                updateChartLabel={updateLabel}
+                updateXAxisLabel={updateXAxisLabel}
+                updateSideInfo={updateSideInfo}
+            />
             <Bar className="card shadow" data={data} options={options} />
         </div>
     )

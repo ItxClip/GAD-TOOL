@@ -50,10 +50,6 @@ const Attendance = ({ excelFiles }) => {
         }))
     }
 
-    /**
-     * Updates the chart label for TotalAttendance chart
-     * @param {string[]} newLabel - The new label to update the chart with
-     */
     const updateLabel = (newLabel) => {
         setTotalAttendanceState((prevState) => ({
             ...prevState,
@@ -61,10 +57,6 @@ const Attendance = ({ excelFiles }) => {
         }))
     }
 
-    /**
-     * Updates the X-axis label for TotalAttendance chart
-     * @param {string} newLabel - The new X-axis label to update the chart with
-     */
     const updateXAxisLabel = (newLabel) => {
         setTotalAttendanceState((prevState) => ({
             ...prevState,

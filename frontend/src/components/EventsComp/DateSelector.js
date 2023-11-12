@@ -17,67 +17,45 @@ export const months = [
     'December',
 ]
 
-/**
- * Calculates the number of male, female and prefer not to say students by quarter for a given year.
- * @param {number} selectedYear - The year for which to calculate the gender distribution.
- * @param {Array} data - An array of student objects containing their gender and timestamp.
- * @returns {Object} An object containing the number of male, female and prefer not to say students by quarter.
- */
-function calculateGenderByQuarter(selectedYear, data) {
-    let genderByQuarter = {
-        Q1: { male: 0, female: 0, preferNotToSay: 0 },
-        Q2: { male: 0, female: 0, preferNotToSay: 0 },
-        Q3: { male: 0, female: 0, preferNotToSay: 0 },
-        Q4: { male: 0, female: 0, preferNotToSay: 0 },
-    }
+function calculateUniqueEventsByQuarter(selectedYear, data) {
+    const uniqueEventsByQuarter = [new Set(), new Set(), new Set(), new Set()]
 
-    data.forEach((student) => {
-        let date = new Date(student.timestamp)
+    data.forEach((item) => {
+        const date = new Date(item.timestamp)
+
         if (date.getFullYear() === selectedYear) {
-            let quarter = Math.floor(date.getMonth() / 3) + 1
-            switch (student.sex) {
-                case 'Male':
-                    genderByQuarter[`Q${quarter}`].male++
-                    break
-                case 'Female':
-                    genderByQuarter[`Q${quarter}`].female++
-                    break
-                default:
-                    genderByQuarter[`Q${quarter}`].preferNotToSay++
-                    break
-            }
+            let quarter = Math.floor(date.getMonth() / 3)
+            uniqueEventsByQuarter[quarter].add(item.eventName)
         }
     })
 
-    return genderByQuarter
+    return uniqueEventsByQuarter.map((set) => set.size)
 }
 
 export function filterByYear(selectedYear, data) {
-    let counts = Array(12).fill(0)
-    let gender = { male: 0, female: 0, preferNotToSay: 0 }
+    let uniqueEventsByMonth = Array(12)
+        .fill()
+        .map(() => new Set())
+    let totalUniqueEvents = new Set()
 
-    let genderByQuarter = calculateGenderByQuarter(selectedYear, data)
+    let uniqueEventsByQuarter = calculateUniqueEventsByQuarter(
+        selectedYear,
+        data
+    )
 
-    data.forEach((student) => {
-        let date = new Date(student.timestamp)
+    data.forEach((event) => {
+        let date = new Date(event.timestamp)
         if (date.getFullYear() === selectedYear) {
-            counts[date.getMonth()]++
-
-            switch (student.sex) {
-                case 'Male':
-                    gender.male++
-                    break
-                case 'Female':
-                    gender.female++
-                    break
-                default:
-                    gender.preferNotToSay++
-                    break
-            }
+            uniqueEventsByMonth[date.getMonth()].add(event.eventName)
+            totalUniqueEvents.add(event.eventName)
         }
     })
 
-    return { counts, gender, genderByQuarter }
+    return {
+        counts: uniqueEventsByMonth.map((set) => set.size),
+        total: totalUniqueEvents.size,
+        uniqueEventsByQuarter,
+    }
 }
 
 export function filterByMonth(selectedYear, selectedMonth, data) {
@@ -118,12 +96,12 @@ export function filterByMonth(selectedYear, selectedMonth, data) {
 }
 
 const DateSelector = ({
-    updateChartData,
-    updateChartLabel,
     excelFiles,
+    updateChartData,
+    updateDataByQuarter,
+    updateChartLabel,
     updateXAxisLabel,
-    GenderDistribution_updateData,
-    GenderQuarterly_updateData,
+    updateSideInfo,
 }) => {
     const [year, setYear] = useState(new Date().getFullYear())
     const [month, setMonth] = useState(new Date().getMonth() + 1)
@@ -136,44 +114,21 @@ const DateSelector = ({
             if (!excelFiles || excelFiles.length === 0) {
                 alert('Data is not loaded yet. Please wait.')
             } else {
-                if (isOnlyMonths) {
-                    const result = filterByMonth(year, month - 1, excelFiles)
-                    const counts = result.counts
-                    const eventNames = result.eventNames
-                    const gender = Object.values(result.gender)
+                // Total Events by Year
+                const result = filterByYear(year, excelFiles)
+                const counts = result.counts
+                const eventNames = months
 
-                    updateChartLabel(eventNames)
-                    updateChartData(counts)
-                    updateXAxisLabel('Events')
+                console.log('Events result: ', result)
+                updateChartData(counts)
+                updateChartLabel(eventNames)
+                updateXAxisLabel('Months')
 
-                    // Gender Distribution
-                    console.log('gender: ')
-                    console.log(gender)
-                    GenderDistribution_updateData(gender)
-                } else {
-                    // Total Events by Year
-                    const result = filterByYear(year, excelFiles)
-                    const counts = result.counts
-                    const eventNames = months
+                // Total Attendance by Quarter
+                updateDataByQuarter(result.uniqueEventsByQuarter)
 
-                    updateChartData(counts)
-                    updateChartLabel(eventNames)
-                    updateXAxisLabel('Months')
-
-                    //
-                    // Gender Distribution
-                    const gender = Object.values(result.gender)
-                    GenderDistribution_updateData(gender)
-
-                    //
-                    // Gender Quarterly
-                    const genderQuarterly = Object.values(
-                        result.genderByQuarter
-                    )
-                    GenderQuarterly_updateData(genderQuarterly)
-                    console.log('genderQuarterly: ')
-                    console.log(genderQuarterly)
-                }
+                // Side Info
+                updateSideInfo(result.total, year, null)
             }
         } catch (error) {
             console.error('An error occurred: ', error)
@@ -182,10 +137,12 @@ const DateSelector = ({
 
     return (
         <>
-            <div className="dateSelector d-flex flex-row align-items-center justify-content-evenly m-2 p-2 rounded-3">
-                <div className="d-flex justify-content-center align-items-center">
-                    <label>Year:</label>
+            <div className="dateSelector_events gap-3 px-4 d-flex flex-row align-items-center justify-content-evenly m-2 p-2 rounded-3">
+                <div className="gap-1 d-flex justify-content-center align-items-center">
+                    <label htmlFor="yearSelect_events">Year:</label>
                     <select
+                        id="yearSelect_events"
+                        name="yearSelect_events"
                         className="form-select"
                         value={year}
                         onChange={(e) => setYear(parseInt(e.target.value))}
@@ -196,38 +153,6 @@ const DateSelector = ({
                             </option>
                         ))}
                     </select>
-                </div>
-
-                <div className="d-flex justify-content-center align-items-center">
-                    <label>Month:</label>
-                    <select
-                        className="form-select"
-                        value={month}
-                        onChange={(e) => setMonth(parseInt(e.target.value))}
-                    >
-                        {months.map((m, i) => (
-                            <option key={i} value={i + 1}>
-                                {m}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="checkBox-container d-flex flex-row flex-nowrap align-items-center">
-                    <input
-                        className="me-2"
-                        type="checkbox"
-                        id="isOnlyMonths_events"
-                        name="isOnlyMonths_events"
-                        onChange={(e) => setIsOnlyMonths(e.target.checked)}
-                    />
-
-                    <label
-                        className="text-nowrap"
-                        htmlFor="isOnlyMonths_events"
-                    >
-                        Events/Month
-                    </label>
                 </div>
 
                 <button

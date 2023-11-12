@@ -21,7 +21,6 @@ const Gender = ({ excelFiles }) => {
                 excelFiles
             )
             updateData(gender)
-            console.log('GenderComp: ', gender)
 
             // Quarterly Gender Dist.
             const genderQuarterly = Object.values(initialData.genderByQuarter)
