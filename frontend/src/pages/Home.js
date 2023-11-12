@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Attendance from '../components/Attendance/Attendance'
 import Gender from '../components/Gender/Gender'
 import EventsComp from '../components/EventsComp/EventsComp'
+import local_data from '../excelFiles_LOCAL.json'
 /**
  * Home component that renders the dashboard page
  * @returns {JSX.Element} The Home component
@@ -18,17 +19,12 @@ const Home = () => {
                 setExcelFiles(json)
                 console.log(json)
                 // Calls the update function to set the initial chart data
-                // const initialData = filterByYear(new Date().getFullYear(), json)
-                // const TotalAttendance = initialData.counts
-                // const GenderDist = Object.values(initialData.gender)
-                // //const GenderQuarterly = initialData.quarterly;
-
-                // TotalAttendance_updateData(TotalAttendance)
-                // GenderDistribution_updateData(GenderDist)
-                // GenderQuarterly_updateData(initialData.genderByQuarter)
             }
         }
         fetchFiles()
+
+        // setExcelFiles(local_data)
+        // console.log(local_data)
     }, [])
 
     return (
