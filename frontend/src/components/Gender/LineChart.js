@@ -51,7 +51,6 @@ const LineChart = ({
         PointElement
     )
 
-    console.log('LineChart/Main chart: ', GenderDistributionState)
     const data = {
         type: 'line',
         labels: GenderDistributionState.label,
