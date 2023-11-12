@@ -115,7 +115,7 @@ export function filterByYear(selectedYear, data) {
 
 export function filterByMonth(selectedYear, selectedMonth, data) {
     let eventNames = []
-    let gender = { male: 0, female: 0, preferNotToSay: 0 }
+    let gender = {}
 
     data.forEach((student) => {
         let date = new Date(student.timestamp)
@@ -125,18 +125,23 @@ export function filterByMonth(selectedYear, selectedMonth, data) {
         ) {
             if (!eventNames.includes(student.eventName)) {
                 eventNames.push(student.eventName)
+                gender[student.eventName] = {
+                    male: 0,
+                    female: 0,
+                    preferNotToSay: 0,
+                }
             }
 
             // Get gender distribution data
             switch (student.sex) {
                 case 'Male':
-                    gender.male++
+                    gender[student.eventName].male++
                     break
                 case 'Female':
-                    gender.female++
+                    gender[student.eventName].female++
                     break
                 default:
-                    gender.preferNotToSay++
+                    gender[student.eventName].preferNotToSay++
                     break
             }
         }
@@ -164,52 +169,38 @@ const DateSelector = ({
             if (!excelFiles || excelFiles.length === 0) {
                 alert('Data is not loaded yet. Please wait.')
             } else {
+                let resultMonth, resultYear, eventNames, gender
+                resultYear = filterByYear(year, excelFiles)
+
                 if (isOnlyMonths) {
-                    const result = filterByMonth(year, month - 1, excelFiles)
-                    const eventNames = result.eventNames
-                    const gender = Object.values(result.gender)
-
-                    // Main chart
-                    updateChartLabel(eventNames)
-                    updateXAxisLabel('Events')
-                    updateChartData(gender)
-                    console.log('results: ', result)
-                    console.log('gender: ', gender)
-
-                    // Total Gender Distribution
-                    const sideData = filterByYear(year, excelFiles)
-                    const totalGender = Object.values(sideData.totalGender)
-                    updateSideInfo(totalGender, year, months[month - 1])
-
-                    // Gender Quarterly
-                    const genderQuarterly = Object.values(
-                        sideData.genderByQuarter
+                    resultMonth = filterByMonth(year, month - 1, excelFiles)
+                    eventNames = resultMonth.eventNames
+                    gender = Object.values(resultMonth.gender)
+                    updateSideInfo(
+                        Object.values(resultYear.totalGender),
+                        year,
+                        months[month - 1]
                     )
-                    updateChartDataQuarterly(genderQuarterly)
-                    console.log('Month_GenderTotal: ', totalGender)
-                    console.log('Month_GenderByQuarter: ', genderQuarterly)
                 } else {
-                    // Total Gender by Year
-                    const result = filterByYear(year, excelFiles)
-                    const eventNames = months
-
-                    updateChartLabel(eventNames)
-                    updateXAxisLabel('Months')
-
-                    // Main Gender Chart
-                    const gender = calculateGenderByMonth(year, excelFiles)
-                    updateChartData(gender)
-
-                    // Total Gender Distribution
-                    const totalGender = Object.values(result.totalGender)
-                    updateSideInfo(totalGender, year, null)
-
-                    // Gender Quarterly
-                    const genderQuarterly = Object.values(
-                        result.genderByQuarter
+                    eventNames = months
+                    gender = calculateGenderByMonth(year, excelFiles)
+                    updateSideInfo(
+                        Object.values(resultYear.totalGender),
+                        year,
+                        null
                     )
-                    updateChartDataQuarterly(genderQuarterly)
                 }
+
+                // Main chart
+                updateChartLabel(eventNames)
+                updateXAxisLabel(isOnlyMonths ? 'Events' : 'Months')
+                updateChartData(gender)
+
+                // Gender Quarterly
+                const genderQuarterly = Object.values(
+                    resultYear.genderByQuarter
+                )
+                updateChartDataQuarterly(genderQuarterly)
             }
         } catch (error) {
             console.error('An error occurred: ', error)
