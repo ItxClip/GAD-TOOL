@@ -3,6 +3,9 @@ import Attendance from '../components/Attendance/Attendance'
 import Gender from '../components/Gender/Gender'
 import EventsComp from '../components/EventsComp/EventsComp'
 import local_data from '../excelFiles_LOCAL.json'
+import DataTable from 'react-data-table-component';
+import '../table.css';
+import 'boxicons';
 /**
  * Home component that renders the dashboard page
  * @returns {JSX.Element} The Home component
@@ -25,7 +28,73 @@ const Home = () => {
 
         // setExcelFiles(local_data)
         // console.log(local_data)
-    }, [])
+    }, []);
+
+    // Calculate counts for Male, Female, and Prefer Not To Say for each event
+        const eventData = excelFiles
+        ? excelFiles.reduce((accumulator, file) => {
+            const eventName = file.eventName;
+            const createdAt = new Date(file.createdAt);
+
+            if (!isNaN(createdAt.getTime())) {
+                // Check if createdAt is a valid date
+                if (!accumulator[eventName]) {
+                accumulator[eventName] = {
+                    eventName,
+                    createdAt: `${createdAt.toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                    })} ${createdAt.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    })}`,
+                    maleCount: 0,
+                    femaleCount: 0,
+                    preferNotToSayCount: 0,
+                };
+                }
+
+                // Update counts based on gender
+                if (file.sex === 'Male') {
+                accumulator[eventName].maleCount += 1;
+                } else if (file.sex === 'Female') {
+                accumulator[eventName].femaleCount += 1;
+                } else if (file.sex === 'Prefer not to say') {
+                accumulator[eventName].preferNotToSayCount += 1;
+                }
+            }
+
+            return accumulator;
+            }, {})
+        : {};
+
+        const uniqueEvents = Object.values(eventData);
+
+        const columns = [
+            { name: 'Event Name', selector: 'eventName', sortable: true},
+            { name: 'Created At', selector: 'createdAt', sortable: true, minWidth: '250px'},
+            { name: 'Male', selector: (row) => row.maleCount, sortable: true },
+            { name: 'Female', selector: (row) => row.femaleCount, sortable: true },
+            {
+            name: 'PFS',
+            selector: (row) => row.preferNotToSayCount,
+            sortable: true,
+            },
+            // Add more columns as needed
+            {
+            name: 'Action',
+            cell: (row) => (
+                <button className="icon-button" onClick={() => handleDelete(row)}><box-icon name='trash'></box-icon></button>
+                
+            ),
+            },
+        ];
+
+        const handleDelete = (row) => {
+            // Add your delete logic here using the row data
+            console.log('Delete button clicked for row:', row);
+        };
 
     return (
         <div className="home outline d-flex flex-column align-items-center align-content-center justify-content-center">
@@ -34,78 +103,29 @@ const Home = () => {
             <EventsComp excelFiles={excelFiles} />
 
             <div className="eventlist">
-                <h1>Logs</h1>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Event Name</th>
-                            <th>Created Date</th>
-                            <th>Male</th>
-                            <th>Female</th>
-                            <th>Prefer not to say</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {excelFiles &&
-                            Array.from(
-                                new Set(
-                                    excelFiles.map(
-                                        (excelFile) => excelFile.eventName
-                                    )
-                                )
-                            ).map((eventName) => {
-                                const matchingFiles = excelFiles.filter(
-                                    (file) => file.eventName === eventName
-                                )
-                                const latestFile = matchingFiles.reduce(
-                                    (prev, current) =>
-                                        prev.createdAt > current.createdAt
-                                            ? prev
-                                            : current
-                                )
-                                const formattedDate = `${new Date(
-                                    latestFile.createdAt
-                                ).toLocaleDateString('en-US', {
-                                    month: 'long',
-                                    year: 'numeric',
-                                    day: 'numeric',
-                                })} ${new Date(
-                                    latestFile.createdAt
-                                ).toLocaleTimeString()}`
-
-                                // Count the number of males, females, and prefer not to say
-                                const maleCount = matchingFiles.filter(
-                                    (file) => file.sex === 'Male'
-                                ).length
-                                const femaleCount = matchingFiles.filter(
-                                    (file) => file.sex === 'Female'
-                                ).length
-                                const preferNotToSayCount =
-                                    matchingFiles.filter(
-                                        (file) =>
-                                            file.sex === 'Prefer not to say'
-                                    ).length
-
-                                return (
-                                    <tr
-                                        key={eventName}
-                                        className="event-container"
-                                    >
-                                        <td>{eventName}</td>
-                                        <td>{formattedDate}</td>
-                                        <td>{maleCount}</td>
-                                        <td>{femaleCount}</td>
-                                        <td>{preferNotToSayCount}</td>
-                                        <td>
-                                            <button>Delete</button>
-                                        </td>
-                                    </tr>
-                                )
-                            })}
-                    </tbody>
-                </table>
+                <DataTable
+                title="Event Table"
+                columns={columns}
+                data={uniqueEvents}
+                pagination
+                highlightOnHover
+                
+                customStyles={{
+                    headRow: {
+                    style: {
+                        borderBottom: '2px solid black',
+                        background: 'white', // Set the background color for the header row
+                    },
+                    },
+                    headCells: {
+                    style: {
+                        color: 'black', // Set the text color for the header cells
+                    },
+                    },
+                }}
+                />
             </div>
+
         </div>
     )
 }
