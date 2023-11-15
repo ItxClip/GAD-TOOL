@@ -17,9 +17,10 @@ const ModalImport = () => {
           <span>GAD OFFICE</span>
         </div>
         <div className="sidebar-icons">
-          <box-icon name='line-chart' title="Line Chart"></box-icon>
-          <box-icon name='doughnut-chart' title="Doughnut Chart"></box-icon>
-          <box-icon name='bar-chart-alt-2' title="Bar Chart"></box-icon>
+          <box-icon name='bar-chart'  title="Attendance"></box-icon>
+          <box-icon name='line-chart-down' title="Gender"></box-icon>
+          <box-icon name='bar-chart-alt-2' title="Events"></box-icon>
+          <box-icon name='list-ol' title="Table Logs"></box-icon>
           <box-icon name='import' onClick={handleShow} title="Import"></box-icon>
           <box-icon name='export' title="Export"></box-icon>
           <div className="logout">
